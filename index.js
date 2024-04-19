@@ -40,14 +40,31 @@ app.get('/info', (req, res) => {
   res.send(`<p>Phonebook has info for ${numberOfPeople} people <hr>${date}</p>`)
 })
 
+// Lisää henkilö luetteloon
 app.post('/api/persons', (req, res) => {
   const id = Math.floor(Math.random() * 10000000)
 
   const person = req.body
   person.id = id
 
-  persons = persons.concat(person)
-  res.json(person)
+  if (!person.name) {
+    return res.status(400).json({
+      error: 'name missing'
+    })
+  }
+  else if (!person.number) {
+    return res.status(400).json({
+      error: 'number missing'
+    })
+  }
+  else if (persons.find(p => p.name === person.name)) {
+    return res.status(400).json({
+      error: 'name must be unique'
+    })
+  } else {
+    persons = persons.concat(person)
+    res.json(person)
+  }
 })
 
 app.get('/api/persons/:id', (req, res) => {
