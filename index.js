@@ -5,6 +5,8 @@ const app = express()
 app.use(express.json())
 app.use(morgan('tiny'))
 
+// Custom token joka näyttää pyynnön bodyn (käytetään POSTissa)
+morgan.token('body', (req) => JSON.stringify(req.body))
 
 let persons = [
   {
@@ -44,7 +46,7 @@ app.get('/info', (req, res) => {
 })
 
 // Lisää henkilö luetteloon
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', morgan(':body'), (req, res) => {
   const id = Math.floor(Math.random() * 10000000)
 
   const person = req.body
