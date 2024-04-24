@@ -7,6 +7,7 @@ const app = express()
 app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cors())
+app.use(express.static('dist'))
 
 // Custom token joka näyttää pyynnön bodyn (käytetään POSTissa)
 morgan.token('body', (req) => JSON.stringify(req.body))
