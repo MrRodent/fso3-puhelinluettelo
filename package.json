@@ -12,13 +12,14 @@
     "type": "git",
     "url": "git+https://github.com/MrRodent/fso3-puhelinluettelo.git"
   },
-  "author": "Tommi Partanen",
+  "author": "MrRodent",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/MrRodent/fso3-puhelinluettelo/issues"
   },
   "homepage": "https://github.com/MrRodent/fso3-puhelinluettelo#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0"
   },
