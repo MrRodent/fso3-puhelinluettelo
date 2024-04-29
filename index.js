@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-  Person.find({}).then(notes => {
+  Person.find({}).then(persons => {
     res.json(persons)
   })
 })
@@ -56,10 +56,12 @@ app.get('/info', (req, res) => {
 
 // Lisää henkilö luetteloon
 app.post('/api/persons', morgan(':body'), (req, res) => {
-  const id = Math.floor(Math.random() * 10000000)
+  const body = req.body
 
-  const person = req.body
-  person.id = id
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
 
   if (!person.name) {
     return res.status(400).json({
@@ -70,14 +72,15 @@ app.post('/api/persons', morgan(':body'), (req, res) => {
     return res.status(400).json({
       error: 'number missing'
     })
-  }
-  else if (persons.find(p => p.name === person.name)) {
-    return res.status(400).json({
-      error: 'name must be unique'
-    })
+  // }
+  // else if (persons.find(p => p.name === person.name)) {
+  //   return res.status(400).json({
+  //     error: 'name must be unique'
+  //   })
   } else {
-    persons = persons.concat(person)
-    res.json(person)
+    person.save().then(savedPerson => {
+      res.json(savedPerson)
+    })
   }
 })
 
