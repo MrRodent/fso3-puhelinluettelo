@@ -57,7 +57,7 @@ app.get('/info', (req, res) => {
 })
 
 // Lisää henkilö luetteloon
-app.post('/api/persons', morgan(':body'), (req, res) => {
+app.post('/api/persons', morgan(':body'), (req, res, next) => {
   const body = req.body
 
   const person = new Person({
@@ -65,27 +65,24 @@ app.post('/api/persons', morgan(':body'), (req, res) => {
     number: body.number,
   })
 
-  if (!person.name) {
-    return res.status(400).json({
-      error: 'name missing'
-    })
+  if (person.name === "") {
+    const error = new Error('Name cannot be empty')
+    error.name = "NameError"
+    return next(error)
   }
-  else if (!person.number) {
-    return res.status(400).json({
-      error: 'number missing'
-    })
-  // }
-  // else if (persons.find(p => p.name === person.name)) {
-  //   return res.status(400).json({
-  //     error: 'name must be unique'
-  //   })
-  } else {
-    person.save().then(savedPerson => {
-      res.json(savedPerson)
-    })
+  else if (person.number === "") {
+    const error = new Error('Number cannot be empty')
+    error.name = "NumberError"
+    return next(error)
   }
-})
 
+  person.save()
+    .then(result => {
+      res.json(result)
+    })
+    .catch(error => next(error))
+})
+  
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
@@ -97,7 +94,7 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(result => {
       res.status(204).end()
@@ -107,15 +104,21 @@ app.delete('/api/persons/:id', (req, res) => {
 
 ////////////
 // Handlers
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
 }
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, req, res, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+  else if (error.name === 'NameError') {
+    return res.status(400).send({ error: 'empty name' })
+  }
+  else if (error.name === 'NumberError') {
+    return res.status(400).send({ error: 'empty number' })
   }
 
   next(error)
