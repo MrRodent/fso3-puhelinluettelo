@@ -38,6 +38,8 @@ let persons = [
   }
 ]
 
+///////////
+// Routes
 app.get('/', (req, res) => {
   res.send('<h1>Hei</h1>')
 })
@@ -96,13 +98,34 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
-
-  // Poiston onnistuttua annetaan koodi 204 (No Content)
-  res.status(204).end()
+  Person.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
+////////////
+// Handlers
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
+
+////////
+// Port
 const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
