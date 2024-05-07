@@ -13,9 +13,24 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
 })
 
+// const personSchema = new mongoose.Schema({
+//   name: String,
+//   number: String,
+// })
+
 const personSchema = new mongoose.Schema({
   name: String,
-  number: String,
+  number: {
+    type: String,
+    minlength: 9,
+    validate: {
+      validator: (v) => {
+        return /^\d{2,3}-\d{5,}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid number`
+    }, 
+    required: true
+  }
 })
 
 // Muunna MongoDB:n olio-id mjonoksi ja poista versionumero
