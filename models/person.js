@@ -28,7 +28,7 @@ const personSchema = new mongoose.Schema({
         return /^\d{2,3}-\d{5,}$/.test(v);
       },
       message: props => `${props.value} is not a valid number`
-    }, 
+    },
     required: true
   }
 })

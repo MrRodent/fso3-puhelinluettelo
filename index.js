@@ -82,7 +82,7 @@ app.post('/api/persons', morgan(':body'), (req, res, next) => {
     })
     .catch(error => next(error))
 })
-  
+
 // Hae yksittäinen henkilö
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
@@ -101,8 +101,8 @@ app.put('/api/persons/:id', (req, res, next) => {
   const { name, number } = req.body
 
   Person.findByIdAndUpdate(
-    req.params.id, 
-    { name, number }, 
+    req.params.id,
+    { name, number },
     { new: true, runValidators: true, context: 'query' })   // Validaattori ei anna päivittää numeroa väärään formaattiin
     .then(updatedPerson => {
       res.json(updatedPerson)
